@@ -10,13 +10,15 @@ globals
     lifespan             ;; the lifespan of a turtle
     chance-reproduce     ;; the probability of a turtle generating an offspring each tick
     carrying-capacity    ;; the number of turtles that can be in the world at one time
-    immunity-duration ]  ;; how many weeks immunity lasts
+    immunity-duration    ;; how many weeks immunity lasts
+    selected ]           ;; status if mouse has been clicked or not
 
 ;; The setup is divided into four procedures
 to setup
   clear-all
   setup-constants
   setup-turtles
+  set selected nobody
   update-global-variables
   update-display
   reset-ticks
@@ -32,8 +34,6 @@ to setup-turtles
       set remaining-immunity 0
       set size 1.5  ;; easier to see
       get-healthy ]
-  ask n-of 10 turtles
-    [ get-sick ]
 end
 
 to get-sick ;; turtle procedure
@@ -62,6 +62,15 @@ to setup-constants
 end
 
 to go
+  ifelse mouse-down? [
+    ; if the mouse is down then handle selecting
+    handle-select
+  ][
+    ; otherwise, make sure the previous selection is deselected
+    set selected nobody
+    reset-perspective
+  ]
+
   ask turtles [
     get-older
     move
@@ -71,6 +80,23 @@ to go
   update-global-variables
   update-display
   tick
+end
+
+to handle-select
+  ; if no turtle is selected
+  ifelse selected = nobody  [
+    ; pick the closet turtle
+    set selected min-one-of turtles [distancexy mouse-xcor mouse-ycor]
+    ; check whether or not it's close enough
+    ifelse [distancexy mouse-xcor mouse-ycor] of selected > 1 [
+      set selected nobody ; if not, don't select it
+    ][
+      watch selected ; if it is, go ahead and `watch` it
+    ]
+  ][
+    ; if a turtle is selected, move it to the mouse
+    ask selected [ get-sick ]
+  ]
 end
 
 to update-global-variables
@@ -277,7 +303,7 @@ number-people
 number-people
 10
 carrying-capacity
-150.0
+49.0
 1
 1
 NIL
