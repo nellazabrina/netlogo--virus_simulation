@@ -11,7 +11,7 @@ globals
     chance-reproduce     ;; the probability of a turtle generating an offspring each tick
     carrying-capacity    ;; the number of turtles that can be in the world at one time
     immunity-duration    ;; how many weeks immunity lasts
-    selected ]           ;; status if mouse has been clicked or not
+    selected]            ;; status if mouse has been clicked or not
 
 ;; The setup is divided into four procedures
 to setup
@@ -125,7 +125,7 @@ end
 to move ;; turtle procedure
   rt random 100
   lt random 100
-  fd 1
+  fd ifelse-value sick? [step-sick] [step-healthy]
 end
 
 ;; If a turtle is sick, it infects other turtles on the same patch.
@@ -218,7 +218,7 @@ chance-recover
 chance-recover
 0.0
 99.0
-75.0
+20.0
 1.0
 1
 %
@@ -233,7 +233,7 @@ infectiousness
 infectiousness
 0.0
 99.0
-65.0
+90.0
 1.0
 1
 %
@@ -343,14 +343,44 @@ ticks / 52
 11
 
 CHOOSER
-65
-195
-210
+70
 240
+215
+285
 turtle-shape
 turtle-shape
 "person" "circle"
 0
+
+SLIDER
+5
+195
+130
+228
+step-healthy
+step-healthy
+0
+2
+2.0
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+145
+195
+265
+228
+step-sick
+step-sick
+0
+2
+1.0
+0.1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
