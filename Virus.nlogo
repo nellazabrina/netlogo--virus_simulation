@@ -11,14 +11,16 @@ globals
     chance-reproduce     ;; the probability of a turtle generating an offspring each tick
     carrying-capacity    ;; the number of turtles that can be in the world at one time
     immunity-duration    ;; how many weeks immunity lasts
-    selected]            ;; status if mouse has been clicked or not
+    selected             ;; status if mouse has been clicked or not
+    started ]            ;; status if the simulation has beed started
 
 ;; The setup is divided into four procedures
 to setup
   clear-all
   setup-constants
-  setup-turtles
   set selected nobody
+  set started false
+  setup-turtles
   update-global-variables
   update-display
   reset-ticks
@@ -61,26 +63,31 @@ to setup-constants
   set immunity-duration 52
 end
 
-to go
-  ifelse mouse-down? [
-    ; if the mouse is down then handle selecting
-    handle-select
-  ][
-    ; otherwise, make sure the previous selection is deselected
-    set selected nobody
-    reset-perspective
+to exec
+  ifelse started [
+    start
+    ask turtles [
+      get-older
+      move
+      if sick? [ recover-or-die ]
+      ifelse sick? [ infect ] [ reproduce ]
+    ]
   ]
-
-  ask turtles [
-    get-older
-    move
-    if sick? [ recover-or-die ]
-    ifelse sick? [ infect ] [ reproduce ]
+  [
+    ifelse mouse-down? [
+      ; if the mouse is down then handle selecting
+      handle-select
+    ][
+      ; otherwise, make sure the previous selection is deselected
+      set selected nobody
+      reset-perspective
+    ]
   ]
   update-global-variables
   update-display
   tick
 end
+
 
 to handle-select
   ; if no turtle is selected
@@ -97,6 +104,10 @@ to handle-select
     ; if a turtle is selected, move it to the mouse
     ask selected [ get-sick ]
   ]
+end
+
+to start
+  set started true
 end
 
 to update-global-variables
@@ -195,10 +206,10 @@ ticks
 30.0
 
 SLIDER
-40
-155
-234
-188
+35
+215
+229
+248
 duration
 duration
 0.0
@@ -210,10 +221,10 @@ weeks
 HORIZONTAL
 
 SLIDER
-40
-121
-234
-154
+35
+181
+229
+214
 chance-recover
 chance-recover
 0.0
@@ -225,10 +236,10 @@ chance-recover
 HORIZONTAL
 
 SLIDER
-40
-87
-234
-120
+35
+147
+229
+180
 infectiousness
 infectiousness
 0.0
@@ -256,28 +267,11 @@ NIL
 NIL
 1
 
-BUTTON
-138
-48
-209
-84
-NIL
-go
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-0
-
 PLOT
-15
-375
-267
-539
+10
+435
+262
+599
 Populations
 weeks
 people
@@ -310,10 +304,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-28
-328
-103
-373
+23
+388
+98
+433
 NIL
 %infected
 1
@@ -321,10 +315,10 @@ NIL
 11
 
 MONITOR
-105
-328
-179
-373
+100
+388
+174
+433
 NIL
 %immune
 1
@@ -332,10 +326,10 @@ NIL
 11
 
 MONITOR
-181
-329
-255
-374
+176
+389
+250
+434
 years
 ticks / 52
 1
@@ -343,20 +337,20 @@ ticks / 52
 11
 
 CHOOSER
-70
-240
-215
-285
+65
+300
+210
+345
 turtle-shape
 turtle-shape
 "person" "circle"
 0
 
 SLIDER
-5
-195
-130
-228
+0
+255
+125
+288
 step-healthy
 step-healthy
 0
@@ -368,10 +362,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-145
-195
-265
-228
+140
+255
+260
+288
 step-sick
 step-sick
 0
@@ -381,6 +375,40 @@ step-sick
 1
 NIL
 HORIZONTAL
+
+BUTTON
+145
+50
+207
+83
+NIL
+start
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+110
+95
+172
+128
+run
+exec
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
