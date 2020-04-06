@@ -394,11 +394,11 @@ NIL
 1
 
 BUTTON
-110
+75
 95
-172
+202
 128
-run
+exec program
 exec
 T
 1
